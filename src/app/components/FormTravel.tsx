@@ -38,8 +38,7 @@ export default function FormTravel() {
           `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?namePrefix=${cityQuery}&minPopulation=100000&limit=5`,
           {
             headers: {
-              'x-rapidapi-key':
-                'c5e88be95emsh3d8a77df1f72bd3p192972jsn58c821dcf045',
+              'x-rapidapi-key': process.env.ApiCity || '',
               'x-rapidapi-host': 'wft-geo-db.p.rapidapi.com',
             },
           }
