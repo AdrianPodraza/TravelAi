@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePuterStore } from '../lib/puter';
 import { prepareInstructions } from '../constants';
 import { useRouter } from 'next/navigation';
@@ -24,39 +24,42 @@ export default function FormTravel() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [cityQuery, setCityQuery] = useState('');
   const [citySuggestions, setCitySuggestions] = useState<
-    { id: string; name: string }[]
+    {
+      lat: string;
+      name: string;
+    }[]
   >([]);
   const [selectedCity, setSelectedCity] = useState('');
+  const citiesCache = useRef<any[]>([]); // 🔹 cache w pamięci
 
   // debounce query
   useEffect(() => {
-    const timeout = setTimeout(async () => {
-      if (cityQuery.length < 2) return;
-
+    const loadCities = async () => {
       try {
-        const res = await fetch(
-          `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?namePrefix=${cityQuery}&minPopulation=100000&limit=5`,
-          {
-            headers: {
-              'x-rapidapi-key': process.env.ApiCity || '',
-              'x-rapidapi-host': 'wft-geo-db.p.rapidapi.com',
-            },
-          }
-        );
+        const res = await fetch('/data/cities.json', { cache: 'force-cache' });
         const data = await res.json();
-        if (Array.isArray(data.data)) {
-          setCitySuggestions(
-            data.data.map((c: any) => ({
-              id: c.id,
-              name: `${c.name}, ${c.country}`,
-            }))
-          );
-        } else {
-          setCitySuggestions([]);
-        }
+        citiesCache.current = data;
       } catch (err) {
-        console.error('City fetch failed', err);
+        console.error('City data load failed', err);
       }
+    };
+
+    loadCities();
+  }, []);
+
+  // ✅ Filtrowanie z cache (bez dodatkowych fetchów)
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (cityQuery.length < 2) {
+        setCitySuggestions([]);
+        return;
+      }
+
+      const filtered = citiesCache.current
+        .filter((c) => c.name.toLowerCase().includes(cityQuery.toLowerCase()))
+        .slice(0, 10);
+
+      setCitySuggestions(filtered);
     }, 300);
 
     return () => clearTimeout(timeout);
@@ -146,7 +149,7 @@ export default function FormTravel() {
           <ul className="mt-1 max-h-40 overflow-y-auto rounded border bg-white shadow">
             {citySuggestions.map((city) => (
               <li
-                key={city.id}
+                key={city.lat}
                 onClick={() => {
                   setSelectedCity(city.name);
                   setCityQuery(city.name);
