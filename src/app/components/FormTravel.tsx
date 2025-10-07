@@ -30,6 +30,7 @@ export default function FormTravel() {
     }[]
   >([]);
   const [selectedCity, setSelectedCity] = useState('');
+  const [isSelected, setIsSelected] = useState(false);
   const citiesCache = useRef<any[]>([]); // 🔹 cache w pamięci
 
   // debounce query
@@ -49,6 +50,8 @@ export default function FormTravel() {
 
   // ✅ Filtrowanie z cache (bez dodatkowych fetchów)
   useEffect(() => {
+    if (isSelected) return;
+
     const timeout = setTimeout(() => {
       if (cityQuery.length < 2) {
         setCitySuggestions([]);
@@ -126,7 +129,7 @@ export default function FormTravel() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex min-w-[500px] flex-col gap-4 rounded-lg border-2 border-blue-300 bg-white px-4 py-8 shadow-2xl"
+      className="flex min-w-[500px] flex-col gap-4 rounded-lg border-2 border-blue-300 bg-[#f2f2f2] px-4 py-8 shadow-2xl [&_input]:bg-white [&_input]:shadow-lg [&_select]:bg-white [&_select]:shadow-lg"
     >
       {/* Destination */}
       <div className="flex flex-col gap-2">
@@ -154,6 +157,8 @@ export default function FormTravel() {
                   setSelectedCity(city.name);
                   setCityQuery(city.name);
                   setCitySuggestions([]);
+
+                  setIsSelected(true);
                 }}
                 className="cursor-pointer p-2 hover:bg-blue-100"
               >

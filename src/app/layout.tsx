@@ -4,6 +4,7 @@ import './globals.css';
 import ClientInit from './components/ClientInit';
 
 const getPoppins = Poppins({
+  subsets: ['latin-ext'],
   weight: '400',
   style: 'normal',
 });

@@ -1,22 +1,35 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+// eslint.config.mjs
+import ts from '@typescript-eslint/eslint-plugin';
+import next from '@next/eslint-plugin-next';
+import prettier from 'eslint-plugin-prettier';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
-const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+export default [
   {
+    ignores: ['.next', 'node_modules'],
+  },
+  {
+    files: ['**/*.{ts,tsx}'],
+
+    plugins: {
+      '@typescript-eslint': ts,
+      '@next/next': next,
+      prettier,
+    },
     rules: {
-      // Disable ESLint rules that might conflict with Prettier
-      "prettier/prettier": "error",
+      ...next.configs.recommended.rules,
+      ...ts.configs.recommended.rules,
+      'prettier/prettier': 'error',
+    },
+  },
+  {
+    files: ['**/*.{js,jsx}'],
+    plugins: {
+      '@next/next': next,
+      prettier,
+    },
+    rules: {
+      ...next.configs.recommended.rules,
+      'prettier/prettier': 'error',
     },
   },
 ];
-
-export default eslintConfig;

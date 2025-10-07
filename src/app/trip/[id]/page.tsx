@@ -2,11 +2,19 @@
 import { useEffect, useState } from 'react';
 import { usePuterStore } from '@/app/lib/puter';
 import Loader from '@/app/components/Loader';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { Lightbulb, MapPin, Utensils, Info } from 'lucide-react';
 
-export default function TripPage({ params }: { params: { id: string } }) {
+type TripPageProps = {
+  params: {
+    id: string;
+  };
+};
+
+export default function TripPage({ params }: TripPageProps) {
   const { id } = params;
   const { kv, puterReady } = usePuterStore();
 
@@ -61,14 +69,17 @@ export default function TripPage({ params }: { params: { id: string } }) {
         <h2 className="mb-6 text-3xl font-bold text-gray-800">{destination}</h2>
 
         <div className="grid gap-6 md:grid-cols-2">
-          <Card className="col-span-2">
+          <Card className="col-span-2 bg-[#fafafa] shadow-lg">
             <CardContent className="p-5">
               <h3 className="mb-4 text-2xl font-semibold text-gray-700">
                 Itinerary
               </h3>
               <div className="space-y-4">
                 {itinerary.map((day: any, i: number) => (
-                  <div key={i} className="rounded-lg border bg-white p-4">
+                  <div
+                    key={i}
+                    className="rounded-lg border bg-[#fefefe] p-4 shadow-lg hover:shadow-xl"
+                  >
                     <h4 className="font-medium text-gray-700">Day {day.day}</h4>
                     <div className="mt-2 grid grid-cols-3 gap-2 text-sm">
                       <div>
@@ -92,21 +103,42 @@ export default function TripPage({ params }: { params: { id: string } }) {
             </CardContent>
           </Card>
 
-          <Card className="col-span-2">
-            <CardContent className="p-5">
-              <h3 className="mb-3 text-xl font-semibold text-gray-700">Tips</h3>
-              {Object.entries(tipsAndRecommendations).map(([cat, tips]) => (
-                <div key={cat} className="mb-4">
-                  <h4 className="font-medium text-gray-600 capitalize">
-                    {cat}
-                  </h4>
-                  <ul className="list-disc pl-6 text-sm text-gray-800">
-                    {(tips as string[]).map((tip, idx) => (
-                      <li key={idx}>{tip}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+          <Card className="col-span-2 bg-[#fafafa] shadow-lg">
+            <CardContent className="p-6">
+              <h3 className="mb-5 flex items-center gap-2 text-2xl font-semibold">
+                <Lightbulb className="h-5 w-5 text-yellow-500" />
+                Travel Tips & Recommendations
+              </h3>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                {Object.entries(tipsAndRecommendations).map(([cat, tips]) => (
+                  <div
+                    key={cat}
+                    className="rounded-xl border border-blue-100 bg-[#fefefe] p-4 shadow-sm transition hover:shadow-md"
+                  >
+                    <div className="mb-2 flex items-center gap-2 text-blue-600">
+                      {cat.toLowerCase().includes('food') ? (
+                        <Utensils className="h-4 w-4" />
+                      ) : cat.toLowerCase().includes('place') ? (
+                        <MapPin className="h-4 w-4" />
+                      ) : (
+                        <Info className="h-4 w-4" />
+                      )}
+                      <h4 className="text-sm font-semibold capitalize">
+                        {cat}
+                      </h4>
+                    </div>
+
+                    <ul className="ml-5 list-disc space-y-1 text-sm text-gray-700">
+                      {(tips as string[]).map((tip, idx) => (
+                        <li key={idx} className="leading-snug">
+                          {tip}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </div>
